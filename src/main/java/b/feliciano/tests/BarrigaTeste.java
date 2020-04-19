@@ -1,10 +1,10 @@
 package b.feliciano.tests;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +72,25 @@ public class BarrigaTeste extends BaseTest{
 		.when()
 			.put("/contas/105806")
 		.then()
-			.statusCode(200);
+			.statusCode(200)
+			.body("name", is("Conta Alterada!"))
+		;
+	}
+	
+	@Test
+	public void rejeitaContaComNomeIgual() {
+	
+		Map<String, String> conta = new HashMap<String, String>();
+		conta.put("nome", "Conta Alterada!");
+		
+		given()
+			.header("Authorization","JWT "+ TOKEN)
+			.body(conta)
+		.when()
+			.post("/contas")
+		.then()
+			.statusCode(400)
+			.body("error", is("Já existe uma conta com esse nome!"))
 		;
 	}
 }
